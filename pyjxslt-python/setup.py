@@ -9,23 +9,23 @@ except ImportError:
 jarfiles = ['lib/py4j-0.9.jar', 'lib/pyjxslt.jar', 'lib/Saxon-HE-9.7.0-1.jar']
 
 setup(
-    name='pyjxslt',
+    name='pyjxslt-user-defined-address',
     packages=['pyjxslt'],
     package_dir={'pyjxslt': 'src/pyjxslt'},
     package_data={'pyjxslt': ['xsl/*.xsl']},
-    version='0.7.1',
-    url='http://github.com/CTS2/pyjxslt',
+    version='0.7.4',
+    url='https://github.com/gcool-info/pyjxslt/tree/user-defined-address',
     license='BSD License',
-    author='Harold Solbrig',
-    author_email='solbrig.harold@mayo.edu',
+    author='George Koulouris',
+    author_email='george.koulouris1@gmail.com',
     description='Python XSLT 2.0 Gateway',
     long_description='Interface package between native python and the Saxon XSLT 2.0 process, which is'
-                     ' java based.  This package requires Java 1.7.',
+                     ' java based.  This is a fork of pyjxslt to include user-defined addresses. This package requires Java 1.7.',
     install_requires=["py4j >=0.9"],
     scripts=['scripts/pyjxslt', 'scripts/testgateway'],
     zip_safe=True,
     include_package_data=True,
-    data_files=[('share/pyjxslt', jarfiles)],
+    data_files=[('lib/pyjxslt', jarfiles)],
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

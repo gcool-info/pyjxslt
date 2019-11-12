@@ -21,7 +21,7 @@
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
 # IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 # INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
 # DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 # OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
@@ -36,16 +36,20 @@ from py4j.java_gateway import JavaGateway, GatewayClient, Py4JNetworkError
 from .XSLTLibrary import XSLTLibrary
 
 DEFAULT_PORT = 25333
-XML_TO_JSON_KEY = 'A69F49B0-2C34-4762-A27C-081B5FD4FF35'        # A safe key for the XML to JSON XSLT transformation
+DEFAULT_ADDRESS = "127.0.0.1"
+# A safe key for the XML to JSON XSLT transformation
+XML_TO_JSON_KEY = 'A69F49B0-2C34-4762-A27C-081B5FD4FF35'
 
 
 class Gateway(object):
-    def __init__(self, port=DEFAULT_PORT, **_):
+    def __init__(self, port=DEFAULT_PORT, address=DEFAULT_ADDRESS, **_):
         """ Construct a new XSLT gateway.  This uses the py4j gateway to connect to a java server.
 
         @param port: py4j gateway port (default: DEFAULT_PORT)
+        @param address: py4j gateway (default: DEFAULT_ADDRESS)
         """
         self._gwPort = int(port)
+        self._gwAddress = str(address)
         self._converters = {}
         self._xsltLibrary = XSLTLibrary()
         self._xsltFactory = None
@@ -61,16 +65,17 @@ class Gateway(object):
         self._gateway = None
         self._xsltFactory = None
         try:
-            # print("Starting Java gateway on port: %s" % self._gwPort)
-            self._gateway = JavaGateway(GatewayClient(port=self._gwPort))
-            self._xsltFactory = self._gateway.jvm.org.pyjxslt.XSLTTransformerFactory('')
+            self._gateway = JavaGateway(GatewayClient(
+                address=self._gwAddress, port=self._gwPort))
+            self._xsltFactory = self._gateway.jvm.org.pyjxslt.XSLTTransformerFactory(
+                '')
             self._refresh_converters()
         except (socket.error, Py4JNetworkError) as e:
             print(e)
             self._gateway = None
             return False
         return True
-    
+
     def gateway_connected(self, reconnect=True):
         """ Determine whether the gateway is connected
         @param reconnect: True means try to reconnect if not connected
@@ -118,7 +123,8 @@ class Gateway(object):
         # Do the checkConnected first, as, if the connection is isn't reestablished not much we can do
         if self.gateway_connected(reconnect=False) and key not in self._converters:
             try:
-                self._converters[key] = self._xsltFactory.transformer(key, self._xsltLibrary[key])
+                self._converters[key] = self._xsltFactory.transformer(
+                    key, self._xsltLibrary[key])
                 return True
             except socket.error as e:
                 print(e)

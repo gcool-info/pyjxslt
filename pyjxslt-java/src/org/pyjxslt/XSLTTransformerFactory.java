@@ -18,8 +18,6 @@ package org.pyjxslt;
  * limitations under the License.
  */
 
-import net.sf.saxon.functions.Trace;
-
 import java.util.HashMap;
 
 /**
